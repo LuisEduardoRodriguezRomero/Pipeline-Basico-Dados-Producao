@@ -6,6 +6,9 @@ import csv
 import psycopg2
 
 
+def remove_ponto(valor):
+    return int(valor.replace('.',''))
+
 
 # Dados da Conexão
 DB_HOST = "localhost"
@@ -41,7 +44,7 @@ try:
                             produto TEXT,
                             quantidade INTEGER,
                             preco_medio REAL,
-                            receita_total REAL
+                            receita_total INTEGER
                         )'''
     )
 
@@ -77,9 +80,11 @@ with open('./Dados/producao_alimentos.csv', 'r') as file:
         produto = row[0],
         quantidade= row[1],
         preco_medio = float(row[2]),
-        receita_total = float(row[3])
+        receita_total = row[3]
 
         if int(row[1]) > 10:
+
+            receita_total = remove_ponto(receita_total)
 
             cursor.execute(
                 ''' INSERT INTO producao(produto,quantidade,preco_medio,receita_total)
