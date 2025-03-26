@@ -1,5 +1,5 @@
 # Demonstração Prática 4 - Criação de Pipeline de Extração, Limpeza, Transformação e Enriquecimento de Dados
-# Versão 1
+# Versão 2
 
 # Imports
 import csv
@@ -28,6 +28,12 @@ try:
     print("Conexão realizada com sucesso")
 
     cursor = conn.cursor()
+
+
+    cursor.execute('''
+            DROP TABLE producao;
+
+    ''')
 
 # Cria uma tabela para armazenar os dados de produção de alimentos
     cursor.execute(
@@ -73,12 +79,14 @@ with open('./Dados/producao_alimentos.csv', 'r') as file:
         preco_medio = float(row[2]),
         receita_total = float(row[3])
 
-        cursor.execute(
-            ''' INSERT INTO producao(produto,quantidade,preco_medio,receita_total)
-            VALUES(%s,%s,%s,%s)
-            ''',(produto,quantidade,preco_medio,receita_total)
+        if int(row[1]) > 10:
 
-        )
+            cursor.execute(
+                ''' INSERT INTO producao(produto,quantidade,preco_medio,receita_total)
+                VALUES(%s,%s,%s,%s)
+             ''',(produto,quantidade,preco_medio,receita_total)
+
+            )
     conn.commit()
     print('Dados inseridos')
 
