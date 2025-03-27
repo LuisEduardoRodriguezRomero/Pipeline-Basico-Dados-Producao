@@ -1,5 +1,5 @@
 # Demonstração Prática 4 - Criação de Pipeline de Extração, Limpeza, Transformação e Enriquecimento de Dados
-# Versão 2
+# Versão 4
 
 # Imports
 import csv
@@ -44,7 +44,8 @@ try:
                             produto TEXT,
                             quantidade INTEGER,
                             preco_medio REAL,
-                            receita_total INTEGER
+                            receita_total INTEGER,
+                            margem_lucro REAL
                         )'''
     )
 
@@ -53,8 +54,8 @@ try:
     conn.commit()
     conn.close()
     print("Tabela criada com sucesso")
-except:
-    print("Falha de conexão")
+except Exception as e:
+    print("Falha de conexão:{e}")
 
  #Abre o arquivo CSV com os dados de produção de alimentos
 with open('./Dados/producao_alimentos.csv', 'r') as file:
@@ -77,19 +78,17 @@ with open('./Dados/producao_alimentos.csv', 'r') as file:
     cursor = conn.cursor()
     # Insere cada linha do arquivo na tabela do banco de dados
     for row in reader:
-        produto = row[0],
-        quantidade= row[1],
-        preco_medio = float(row[2]),
-        receita_total = row[3]
+
 
         if int(row[1]) > 10:
 
-            receita_total = remove_ponto(receita_total)
+            row[3] = remove_ponto(row[3])
+            margem_lucro =   round((row[3] / float(row[1]) - float(row[2])),2)
 
             cursor.execute(
-                ''' INSERT INTO producao(produto,quantidade,preco_medio,receita_total)
-                VALUES(%s,%s,%s,%s)
-             ''',(produto,quantidade,preco_medio,receita_total)
+                ''' INSERT INTO producao(produto,quantidade,preco_medio,receita_total,margem_lucro)
+                VALUES(%s,%s,%s,%s,%s)
+             ''',(row[0],row[1],row[2],row[3],margem_lucro)
 
             )
     conn.commit()
